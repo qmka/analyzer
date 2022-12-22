@@ -1,10 +1,8 @@
 from flask import Flask, render_template, request, flash, url_for, redirect
 from dotenv import load_dotenv
 import datetime
-import requests
 import psycopg2
 import os
-import datetime
 import validators
 
 
@@ -20,11 +18,12 @@ app = Flask(__name__)
 SECRET_KEY = os.getenv('SECRET_KEY')
 app.secret_key = SECRET_KEY
 
+
 @app.get('/')
 def index():
     return render_template(
         'index.html',
-        title = 'Анализатор страниц'
+        title='Анализатор страниц'
     )
 
 
@@ -46,7 +45,7 @@ def urls_add():
 
         if id_in_database:
             flash('Страница уже существует', 'success')
-            return redirect(url_for('show_url', id = id_in_database[0]))
+            return redirect(url_for('show_url', id=id_in_database[0]))
 
         cur = conn.cursor()
         cur.execute(
@@ -60,12 +59,12 @@ def urls_add():
         id_in_database = cur.fetchone()
         cur.close()
         flash('Страница добавлена', 'success')
-        return redirect(url_for('show_url', id = id_in_database[0]))
+        return redirect(url_for('show_url', id=id_in_database[0]))
     else:
         flash('Некорректный URL', 'danger')
         return render_template(
             'index.html',
-            title = 'Анализатор страниц'
+            title='Анализатор страниц'
         ), 422
 
 
@@ -108,5 +107,5 @@ def show_url(id):
 def urls_id_checks_post(id):
     return render_template(
             'index.html',
-            title = 'Анализатор страниц'
+            title='Анализатор страниц'
         )
