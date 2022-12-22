@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, flash, url_for, redirect
 from dotenv import load_dotenv
-from datetime import datetime
+import datetime
 import requests
 import psycopg2
 import os
@@ -30,7 +30,7 @@ def index():
 
 @app.post('/urls')
 def urls_add():
-    creation_time = datetime.now()
+    creation_time = datetime.datetime.now()
     incoming_form = request.form.to_dict()
     incoming_url = incoming_form['url']
 
@@ -103,3 +103,10 @@ def show_url(id):
                            site2=site2,
                            )
 
+
+@app.post('/urls/<int:id>/checks')
+def urls_id_checks_post(id):
+    return render_template(
+            'index.html',
+            title = 'Анализатор страниц'
+        )
