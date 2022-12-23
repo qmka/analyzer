@@ -107,22 +107,28 @@ def show_url(id):
 def urls_id_checks_post(id):
     try:
         check_time = datetime.datetime.now()
-        
+
         cur = conn.cursor()
         cur.execute('SELECT name FROM urls WHERE id=(%s);', (id,))
-        # sitename = cur.fetchone()
-        # print(sitename)
-        # тут будет реквест
-        # req = requests.get(sitename[0])
+        site_data = cur.fetchone()
+        site_url = site_data[0]
+
+        res = requests.get(site_url)
+        res_code = res.status_code
+        res.raise_for_status()
 
         # пишем в базу
         cur = conn.cursor()
-        cur.execute('INSERT INTO url_checks (url_id, created_at) VALUES ((%s), (%s));',
-                    (id, check_time))
+        cur.execute('INSERT INTO url_checks (url_id, created_at, status_code)'
+                    'VALUES ((%s), (%s), (%s));',
+                    (id, check_time, res_code))
         cur.close()
 
         flash('Проверка прошла успешно', 'success')
+
     except requests.exceptions.HTTPError:
         flash('Что-то пошло не так, попробуйте ещё раз', 'danger')
-    
+    except Exception:
+        flash('Что-то пошло не так, попробуйте ещё раз', 'danger')
+
     return redirect(url_for('show_url', id=id))
