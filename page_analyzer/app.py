@@ -4,7 +4,7 @@ import datetime
 import psycopg2
 import os
 import validators
-
+import requests
 
 # connect to Postgres DB
 load_dotenv()
@@ -105,7 +105,24 @@ def show_url(id):
 
 @app.post('/urls/<int:id>/checks')
 def urls_id_checks_post(id):
-    return render_template(
-            'index.html',
-            title='Анализатор страниц'
-        )
+    try:
+        check_time = datetime.datetime.now()
+        
+        cur = conn.cursor()
+        cur.execute('SELECT name FROM urls WHERE id=(%s);', (id,))
+        # sitename = cur.fetchone()
+        # print(sitename)
+        # тут будет реквест
+        # req = requests.get(sitename[0])
+
+        # пишем в базу
+        cur = conn.cursor()
+        cur.execute('INSERT INTO url_checks (url_id, created_at) VALUES ((%s), (%s));',
+                    (id, check_time))
+        cur.close()
+
+        flash('Проверка прошла успешно', 'success')
+    except requests.exceptions.HTTPError:
+        flash('Что-то пошло не так, попробуйте ещё раз', 'danger')
+    
+    return redirect(url_for('show_url', id=id))
