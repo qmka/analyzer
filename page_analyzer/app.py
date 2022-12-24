@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, url_for, redirect
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 import datetime
 import psycopg2
 import os
@@ -116,12 +117,31 @@ def urls_id_checks_post(id):
         res = requests.get(site_url)
         res_code = res.status_code
         res.raise_for_status()
+        res_html = res.text
+
+        soup = BeautifulSoup(res_html, 'html.parser')
+
+        h1_tag = (soup.find('h1'))
+        title_tag = (soup.find('title'))
+        meta_tag = (soup.find('meta', attrs={'name': 'description'}))
+        msg = 'Отсутствует'
+        h1_content = h1_tag.text if h1_tag is not None else msg
+        title_content = title_tag.text if title_tag is not None else msg
+        meta_content = meta_tag['content'] if meta_tag is not None else msg
 
         # пишем в базу
         cur = conn.cursor()
-        cur.execute('INSERT INTO url_checks (url_id, created_at, status_code)'
-                    'VALUES ((%s), (%s), (%s));',
-                    (id, check_time, res_code))
+        cur.execute('INSERT INTO url_checks (url_id, created_at,'
+                    'status_code, h1, title, description) '
+                    'VALUES ((%s), (%s), (%s), (%s), (%s), (%s));',
+                    (
+                        id,
+                        check_time,
+                        res_code,
+                        h1_content,
+                        title_content,
+                        meta_content
+                    ))
         cur.close()
 
         flash('Проверка прошла успешно', 'success')
