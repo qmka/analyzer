@@ -144,11 +144,11 @@ def urls_id_checks_post(id):
                     ))
         cur.close()
 
-        flash('Проверка прошла успешно', 'success')
+        flash('Страница успешно проверена', 'success')
 
     except requests.exceptions.HTTPError:
-        flash('Что-то пошло не так, попробуйте ещё раз', 'danger')
+        flash('Произошла ошибка при проверке', 'danger')
     except Exception:
-        flash('Что-то пошло не так, попробуйте ещё раз', 'danger')
+        flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('show_url', id=id))
