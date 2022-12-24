@@ -59,7 +59,7 @@ def urls_add():
         )
         id_in_database = cur.fetchone()
         cur.close()
-        flash('Страница добавлена', 'success')
+        flash('Страница успешно добавлена', 'success')
         return redirect(url_for('show_url', id=id_in_database[0]))
     else:
         flash('Некорректный URL', 'danger')
